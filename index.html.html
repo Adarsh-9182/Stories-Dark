@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DarkWhispers — Share What Haunts You</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Courier+Prime:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --void: #050508;
+    --abyss: #0a0a0f;
+    --shadow: #111118;
+    --dusk: #1a1a24;
+    --fog: #252535;
+    --mist: #3a3a50;
+    --ash: #6a6a85;
+    --bone: #b8b0a8;
+    --parchment: #d4c9b8;
+    --blood: #8b1a1a;
+    --crimson: #c0392b;
+    --ember: #e74c3c;
+    --rust: #7d3c1a;
+    --gold: #9a7c3a;
+    --pale-gold: #c4a55a;
+    --ghost: rgba(180, 170, 160, 0.06);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--void);
+    color: var(--parchment);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.5;
+  }
+
+  /* Vignette */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.7) 100%);
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  /* ─── CUSTOM SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--void); }
+  ::-webkit-scrollbar-thumb { background: var(--blood); border-radius: 2px; }
+
+  /* ─── NAVBAR ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 3rem;
+    background: linear-gradient(to bottom, var(--void), transparent);
+    backdrop-filter: blur(0px);
+  }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: -0.02em;
+    color: var(--parchment);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .nav-logo .logo-mark {
+    width: 28px;
+    height: 28px;
+    border: 1.5px solid var(--blood);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    color: var(--crimson);
+    animation: pulse-logo 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-logo {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(139,26,26,0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(139,26,26,0); }
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--ash);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-family: 'Courier Prime', monospace;
+    transition: color 0.3s;
+  }
+
+  .nav-links a:hover { color: var(--parchment); }
+
+  .nav-cta {
+    background: transparent;
+    border: 1px solid var(--blood);
+    color: var(--ember) !important;
+    padding: 0.4rem 1.2rem;
+    border-radius: 2px;
+    transition: background 0.3s, color 0.3s !important;
+  }
+
+  .nav-cta:hover {
+    background: var(--blood) !important;
+    color: var(--parchment) !important;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 60%, rgba(139,26,26,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 20% 80%, rgba(100,20,20,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 30% 40% at 80% 20%, rgba(80,20,40,0.05) 0%, transparent 60%);
+  }
+
+  /* Floating runes/particles */
+  .particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .particle {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    background: var(--blood);
+    border-radius: 50%;
+    animation: float-particle linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes float-particle {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.3; }
+    100% { transform: translateY(-10vh) translateX(var(--drift)); opacity: 0; }
+  }
+
+  .divider-line {
+    width: 1px;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--blood), transparent);
+    margin: 0 auto 2rem;
+    animation: fade-in 2s ease forwards;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--blood);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: slide-up 1s ease 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 9vw, 7.5rem);
+    font-weight: 900;
+    font-style: italic;
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: slide-up 1s ease 0.5s forwards;
+  }
+
+  .hero-title .title-dark { color: var(--parchment); }
+  .hero-title .title-blood {
+    color: var(--crimson);
+    position: relative;
+    display: inline-block;
+  }
+
+  .hero-title .title-blood::after {
+    content: '';
+    position: absolute;
+    bottom: 0.05em;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right, var(--blood), transparent);
+  }
+
+  .hero-subtitle {
+    font-size: 1.2rem;
+    color: var(--ash);
+    max-width: 520px;
+    margin: 1.5rem auto 3rem;
+    font-style: italic;
+    font-weight: 300;
+    opacity: 0;
+    animation: slide-up 1s ease 0.7s forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1.2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: slide-up 1s ease 0.9s forwards;
+  }
+
+  .btn-primary {
+    background: var(--blood);
+    color: var(--parchment);
+    border: none;
+    padding: 0.85rem 2.2rem;
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.3s;
+  }
+
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(139,26,26,0.4);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--bone);
+    border: 1px solid var(--fog);
+    padding: 0.85rem 2.2rem;
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: border-color 0.3s, color 0.3s;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--ash);
+    color: var(--parchment);
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    margin-top: 5rem;
+    opacity: 0;
+    animation: slide-up 1s ease 1.1s forwards;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--parchment);
+    display: block;
+  }
+
+  .stat-label {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ash);
+  }
+
+  .stat-sep {
+    width: 1px;
+    background: var(--fog);
+    align-self: stretch;
+  }
+
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ─── SECTION COMMON ─── */
+  section { padding: 5rem 2rem; }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .section-tag {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--blood);
+    display: block;
+    margin-bottom: 0.8rem;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1.15;
+    color: var(--parchment);
+  }
+
+  /* ─── WRITE STORY SECTION ─── */
+  .write-section {
+    background: var(--abyss);
+    border-top: 1px solid var(--shadow);
+    border-bottom: 1px solid var(--shadow);
+  }
+
+  .write-container {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .write-card {
+    background: var(--shadow);
+    border: 1px solid var(--fog);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .write-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 1.8rem;
+    border-bottom: 1px solid var(--fog);
+    background: var(--dusk);
+  }
+
+  .write-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blood), var(--rust));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    color: var(--parchment);
+    flex-shrink: 0;
+  }
+
+  .write-meta {
+    flex: 1;
+  }
+
+  .write-meta input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--parchment);
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-style: italic;
+    width: 100%;
+    placeholder-color: var(--ash);
+  }
+
+  .write-meta input::placeholder { color: var(--mist); }
+
+  .write-anonymity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--ash);
+    text-transform: uppercase;
+  }
+
+  .anon-toggle {
+    width: 28px;
+    height: 16px;
+    background: var(--blood);
+    border-radius: 8px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .anon-toggle::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: var(--parchment);
+    border-radius: 50%;
+    top: 2px;
+    left: 14px;
+    transition: left 0.3s;
+  }
+
+  .title-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 1.5rem 1.8rem 0.5rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--parchment);
+  }
+
+  .title-input::placeholder { color: var(--fog); }
+
+  .story-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0.5rem 1.8rem 1.5rem;
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    color: var(--bone);
+    line-height: 1.8;
+    resize: none;
+    min-height: 180px;
+  }
+
+  .story-input::placeholder { color: var(--mist); }
+
+  .write-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.8rem;
+    border-top: 1px solid var(--fog);
+    background: var(--dusk);
+  }
+
+  .mood-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .mood-tag {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ash);
+    border: 1px solid var(--fog);
+    padding: 0.25rem 0.7rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: border-color 0.3s, color 0.3s;
+  }
+
+  .mood-tag:hover, .mood-tag.active {
+    border-color: var(--blood);
+    color: var(--ember);
+  }
+
+  .char-count {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.7rem;
+    color: var(--mist);
+  }
+
+  .submit-row {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem 1.8rem 1.5rem;
+    gap: 1rem;
+  }
+
+  /* ─── FEED ─── */
+  .feed-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+  }
+
+  .feed-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid var(--fog);
+  }
+
+  .feed-tab {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ash);
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.3s, border-color 0.3s;
+    margin-bottom: -1px;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+
+  .feed-tab.active {
+    color: var(--parchment);
+    border-bottom-color: var(--blood);
+  }
+
+  .story-card {
+    background: var(--shadow);
+    border: 1px solid var(--fog);
+    border-radius: 3px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+    position: relative;
+  }
+
+  .story-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--blood), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .story-card:hover {
+    border-color: var(--mist);
+    transform: translateX(3px);
+  }
+
+  .story-card:hover::before { opacity: 1; }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 1.5rem 0.8rem;
+  }
+
+  .card-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.8rem;
+    color: var(--parchment);
+  }
+
+  .card-user {
+    flex: 1;
+  }
+
+  .card-username {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.8rem;
+    color: var(--bone);
+    letter-spacing: 0.05em;
+  }
+
+  .card-time {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.65rem;
+    color: var(--ash);
+    letter-spacing: 0.05em;
+  }
+
+  .card-mood {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ember);
+    border: 1px solid rgba(192,57,43,0.3);
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+  }
+
+  .card-body {
+    padding: 0 1.5rem 1rem;
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--parchment);
+    line-height: 1.3;
+    margin-bottom: 0.6rem;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .card-title:hover { color: var(--bone); }
+
+  .card-excerpt {
+    color: var(--ash);
+    font-size: 0.95rem;
+    line-height: 1.65;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-excerpt em {
+    color: var(--bone);
+    font-style: italic;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    gap: 1.5rem;
+  }
+
+  .card-action {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: var(--ash);
+    cursor: pointer;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .card-action:hover { color: var(--crimson); }
+  .card-action .icon { font-size: 0.9rem; }
+
+  .card-action.read-more {
+    margin-left: auto;
+    color: var(--bone);
+    text-decoration: none;
+  }
+
+  .card-action.read-more:hover { color: var(--parchment); }
+
+  /* ─── FEATURED ─── */
+  .featured-card {
+    background: linear-gradient(135deg, var(--shadow), var(--dusk));
+    border: 1px solid var(--blood);
+    border-radius: 3px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .featured-card::before {
+    content: '"';
+    position: absolute;
+    top: -1rem;
+    left: 1rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 8rem;
+    color: rgba(139,26,26,0.15);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .featured-badge {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--pale-gold);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .featured-badge::before {
+    content: '★';
+    color: var(--gold);
+  }
+
+  .featured-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    font-style: italic;
+    color: var(--parchment);
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .featured-excerpt {
+    color: var(--bone);
+    line-height: 1.8;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .featured-meta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* ─── SIDEBAR ELEMENTS ─── */
+  .trending-list {
+    list-style: none;
+  }
+
+  .trending-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--shadow);
+    cursor: pointer;
+  }
+
+  .trending-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--blood);
+    opacity: 0.4;
+    line-height: 1;
+    flex-shrink: 0;
+    width: 2rem;
+    text-align: right;
+  }
+
+  .trending-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--bone);
+    line-height: 1.3;
+    transition: color 0.2s;
+  }
+
+  .trending-item:hover .trending-title { color: var(--parchment); }
+
+  /* ─── LAYOUT ─── */
+  .content-layout {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 3rem;
+    padding: 5rem 2rem;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 5rem;
+    height: fit-content;
+  }
+
+  .sidebar-widget {
+    background: var(--shadow);
+    border: 1px solid var(--fog);
+    border-radius: 3px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .widget-title {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ash);
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--fog);
+  }
+
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tag {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    color: var(--ash);
+    border: 1px solid var(--fog);
+    padding: 0.25rem 0.7rem;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .tag:hover {
+    border-color: var(--blood);
+    color: var(--ember);
+    background: rgba(139,26,26,0.1);
+  }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--shadow);
+    border: 1px solid var(--fog);
+    border-radius: 4px;
+    max-width: 640px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    transform: translateY(20px);
+    transition: transform 0.3s;
+  }
+
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 2rem 2rem 1rem;
+    border-bottom: 1px solid var(--fog);
+  }
+
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    font-style: italic;
+    color: var(--parchment);
+    line-height: 1.2;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--ash);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.2rem;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  .modal-close:hover { color: var(--parchment); }
+
+  .modal-body {
+    padding: 1.5rem 2rem 2rem;
+    font-size: 1rem;
+    line-height: 1.85;
+    color: var(--bone);
+  }
+
+  .modal-body p { margin-bottom: 1.2em; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--shadow);
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+    font-weight: 900;
+    color: var(--ash);
+    margin-bottom: 1rem;
+  }
+
+  .footer-quote {
+    font-style: italic;
+    color: var(--mist);
+    font-size: 0.9rem;
+    max-width: 400px;
+    margin: 0 auto 2rem;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .footer-links a {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mist);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--ash); }
+
+  /* ─── NOTIFICATIONS ─── */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--shadow);
+    border: 1px solid var(--blood);
+    border-radius: 3px;
+    padding: 1rem 1.5rem;
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.8rem;
+    color: var(--bone);
+    z-index: 300;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: transform 0.4s, opacity 0.4s;
+    max-width: 280px;
+  }
+
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .content-layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+    .hero-stats { gap: 1.5rem; }
+  }
+
+  /* ─── WARNING BANNER ─── */
+  .warning-banner {
+    background: rgba(139,26,26,0.1);
+    border-bottom: 1px solid rgba(139,26,26,0.2);
+    padding: 0.6rem 2rem;
+    text-align: center;
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--ash);
+    text-transform: uppercase;
+  }
+
+  .warning-banner span { color: var(--blood); }
+</style>
+</head>
+<body>
+
+<!-- Warning Banner -->
+<div class="warning-banner">
+  <span>⚠ Content Warning:</span> This platform contains dark, mature, and disturbing themes. Reader discretion is strongly advised.
+</div>
+
+<!-- Nav -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="logo-mark">☽</div>
+    DarkWhispers
+  </a>
+  <ul class="nav-links">
+    <li><a href="#feed">Stories</a></li>
+    <li><a href="#trending">Trending</a></li>
+    <li><a href="#write">Write</a></li>
+    <li><a href="#" class="nav-cta">Sign In</a></li>
+  </ul>
+</nav>
+
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="divider-line"></div>
+  <p class="hero-eyebrow">A sanctuary for the unspeakable</p>
+  <h1 class="hero-title">
+    <span class="title-dark">Dark</span><br/>
+    <span class="title-blood">Whispers</span>
+  </h1>
+  <p class="hero-subtitle">
+    Where the shadows speak. Share the stories that kept you awake, the memories that haunt, the truths too dark for daylight.
+  </p>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="scrollToWrite()">Share Your Story</button>
+    <button class="btn-ghost" onclick="scrollToFeed()">Read the Darkness</button>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-number">12,847</span>
+      <span class="stat-label">Confessions</span>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat">
+      <span class="stat-number">4,391</span>
+      <span class="stat-label">Voices</span>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat">
+      <span class="stat-number">∞</span>
+      <span class="stat-label">Shadows</span>
+    </div>
+  </div>
+</section>
+
+<!-- Write Section -->
+<section class="write-section" id="write">
+  <div class="section-header">
+    <span class="section-tag">— Confess —</span>
+    <h2 class="section-title">Let the darkness speak</h2>
+  </div>
+  <div class="write-container">
+    <div class="write-card">
+      <div class="write-header">
+        <div class="write-avatar" id="writerAvatar">?</div>
+        <div class="write-meta">
+          <input type="text" id="writerName" placeholder="Your name (or remain anonymous)" oninput="updateAvatar(this.value)" />
+        </div>
+        <div class="write-anonymity">
+          <div class="anon-toggle" id="anonToggle" onclick="toggleAnon()"></div>
+          <span id="anonLabel">Anonymous</span>
+        </div>
+      </div>
+      <input type="text" class="title-input" id="storyTitle" placeholder="Give your darkness a name..." maxlength="120" />
+      <textarea class="story-input" id="storyBody" placeholder="Begin your confession... The darkness listens. There is no judgment here, only witness." maxlength="5000" oninput="updateCharCount()"></textarea>
+      <div class="write-footer">
+        <div class="mood-tags">
+          <span class="mood-tag" onclick="toggleTag(this)">haunting</span>
+          <span class="mood-tag" onclick="toggleTag(this)">trauma</span>
+          <span class="mood-tag" onclick="toggleTag(this)">grief</span>
+          <span class="mood-tag" onclick="toggleTag(this)">fear</span>
+          <span class="mood-tag" onclick="toggleTag(this)">despair</span>
+          <span class="mood-tag" onclick="toggleTag(this)">paranormal</span>
+        </div>
+        <span class="char-count" id="charCount">0 / 5000</span>
+      </div>
+      <div class="submit-row">
+        <button class="btn-ghost" onclick="clearForm()">Clear</button>
+        <button class="btn-primary" onclick="submitStory()">Whisper Into the Dark</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main content + Sidebar -->
+<div class="content-layout" id="feed">
+
+  <!-- Feed -->
+  <main>
+    <div class="section-header" style="text-align:left; margin-bottom: 2rem;">
+      <span class="section-tag">— The Confessional —</span>
+      <h2 class="section-title">Latest Whispers</h2>
+    </div>
+
+    <!-- Featured -->
+    <div class="featured-card">
+      <div class="featured-badge">Story of the Night</div>
+      <div class="featured-title">The House That Breathed</div>
+      <p class="featured-excerpt">
+        I moved in on a Thursday. By Friday, I noticed the walls had a rhythm — a slow, almost imperceptible expansion and contraction, like the house was alive and breathing in its sleep. I told myself it was the wood settling in winter cold. I was wrong. What I discovered in the basement three weeks later still makes me leave every single light on, even at noon...
+      </p>
+      <div class="featured-meta">
+        <span style="font-family:'Courier Prime',monospace;font-size:0.75rem;color:var(--ash)">by <em style="color:var(--bone)">anonymous_#7734</em></span>
+        <span class="card-mood">paranormal</span>
+        <span style="font-family:'Courier Prime',monospace;font-size:0.7rem;color:var(--ash)">2.4k reads · 183 echoes</span>
+        <button class="card-action read-more" onclick="openModal('The House That Breathed', longStory1)" style="margin-left:auto">Read ›</button>
+      </div>
+    </div>
+
+    <!-- Feed Tabs -->
+    <div class="feed-tabs" id="feedSection">
+      <button class="feed-tab active" onclick="switchTab(this,'recent')">Recent</button>
+      <button class="feed-tab" onclick="switchTab(this,'trending')">Trending</button>
+      <button class="feed-tab" onclick="switchTab(this,'haunting')">Haunting</button>
+    </div>
+
+    <!-- Story Cards -->
+    <div id="storyFeed">
+      <!-- Cards injected by JS -->
+    </div>
+
+  </main>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-widget">
+      <div class="widget-title">☽ Tonight's Shadows</div>
+      <ul class="trending-list">
+        <li class="trending-item">
+          <span class="trending-num">1</span>
+          <span class="trending-title">The last voicemail from someone already dead</span>
+        </li>
+        <li class="trending-item">
+          <span class="trending-num">2</span>
+          <span class="trending-title">I watched my twin disappear from photographs</span>
+        </li>
+        <li class="trending-item">
+          <span class="trending-num">3</span>
+          <span class="trending-title">The hotel room that wasn't on the floor plan</span>
+        </li>
+        <li class="trending-item">
+          <span class="trending-num">4</span>
+          <span class="trending-title">She came back, but something came back with her</span>
+        </li>
+        <li class="trending-item">
+          <span class="trending-num">5</span>
+          <span class="trending-title">The dream I've been having every night for 11 years</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="sidebar-widget">
+      <div class="widget-title">✦ Explore Darkness</div>
+      <div class="tag-cloud">
+        <span class="tag">#grief</span>
+        <span class="tag">#paranormal</span>
+        <span class="tag">#childhood</span>
+        <span class="tag">#possession</span>
+        <span class="tag">#loss</span>
+        <span class="tag">#nightmares</span>
+        <span class="tag">#secrets</span>
+        <span class="tag">#haunting</span>
+        <span class="tag">#betrayal</span>
+        <span class="tag">#isolation</span>
+        <span class="tag">#death</span>
+        <span class="tag">#regret</span>
+        <span class="tag">#supernatural</span>
+        <span class="tag">#trauma</span>
+      </div>
+    </div>
+
+    <div class="sidebar-widget" style="background:rgba(139,26,26,0.08); border-color: rgba(139,26,26,0.3);">
+      <div class="widget-title" style="color:var(--blood)">⚠ Community Rules</div>
+      <p style="font-size:0.8rem;color:var(--ash);line-height:1.7">
+        This is a space for dark <em>fiction and personal reflection</em>. No real threats, no identifying real individuals. The darkness here is a mirror — not a weapon.
+      </p>
+    </div>
+  </aside>
+
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">DarkWhispers</div>
+  <p class="footer-quote">"The oldest and strongest emotion of mankind is fear, and the oldest and strongest kind of fear is fear of the unknown." — H.P. Lovecraft</p>
+  <div class="footer-links">
+    <a href="#">About</a>
+    <a href="#">Guidelines</a>
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── PARTICLES ───
+(function() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 2 + 1;
+    p.style.cssText = `
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;
+      --drift:${(Math.random()-0.5)*100}px;
+      animation-duration:${8+Math.random()*12}s;
+      animation-delay:${-Math.random()*20}s;
+    `;
+    container.appendChild(p);
+  }
+})();
+
+// ─── STORIES DATA ───
+const stories = [
+  {
+    id:1, user:'s.h_4413', avatar:'S', color:'#5a1a1a',
+    time:'2 hours ago', mood:'haunting',
+    title:'The Mirror Stopped Showing My Reflection First',
+    excerpt:'It started small — a half-second delay, like a television with bad signal. I\'d raise my hand and my reflection would follow a beat too late. By the second week, <em>it wasn\'t mimicking me anymore.</em> It was doing things of its own accord.',
+    reads:847, echoes:64,
+    full: `It started small — a half-second delay, like a television with bad signal. I'd raise my hand and my reflection would follow a beat too late. I thought I was tired. I thought I was imagining it.\n\nBy the second week, it wasn't mimicking me anymore. It was doing things of its own accord. I'd stand perfectly still, and the reflection would tilt its head. Slowly. Deliberately.\n\nI covered every mirror in the house with black cloth. But on the third night, I heard them — the sounds of someone pulling the cloth down from the other side.`
+  },
+  {
+    id:2, user:'anonymous_#2291', avatar:'A', color:'#1a1a3a',
+    time:'5 hours ago', mood:'grief',
+    title:'I Still Set a Plate for Her at Dinner',
+    excerpt:'Seven years. My therapist says it\'s a coping mechanism. My son says it\'s beautiful. I say I don\'t know how to stop. Last Tuesday, the plate was scraped clean in the morning — and I live alone.',
+    reads:1204, echoes:201,
+    full:`Seven years. My therapist says it's a coping mechanism. My son says it's beautiful. I say I don't know how to stop.\n\nEvery evening at 6:07 — the time we always ate — I set two places. One for me. One for her. I eat in silence. I tell her about my day. The plate for her goes back in the cupboard, untouched.\n\nLast Tuesday, the plate was scraped clean in the morning. I live alone. The doors were locked. The windows were sealed for winter. There were no crumbs on the floor.\n\nI set the plate again that evening. And I cried, because whatever it was — it felt like love.`
+  },
+  {
+    id:3, user:'void.walker_09', avatar:'V', color:'#1a2a1a',
+    time:'Yesterday', mood:'fear',
+    title:'The Third Knock Was Different',
+    excerpt:'Everyone knows the rule: you don\'t answer the door after the third knock in my grandmother\'s village. I was twenty-three and I didn\'t believe in old rules. The thing that came in looked exactly like my brother.',
+    reads:3891, echoes:447,
+    full:`Everyone knows the rule: you don't answer the door after the third knock.\n\nMy grandmother's village had this law, unspoken but absolute. One knock — maybe someone's there. Two knocks — be careful. Three knocks — do not open the door. Do not speak. Do not let it know you're home.\n\nI was twenty-three. I thought old rules were just fear wearing the mask of tradition.\n\nThe thing that came in looked exactly like my brother. It knew his name. It knew mine. It knew our childhood — every holiday, every scar, every secret we'd told each other in the dark.\n\nBut it couldn't remember which hand he broke when we were eight. And my brother always remembered that. He talked about that cast for years.\n\nI smiled, and offered it tea, and waited until morning. When the sun rose, the chair it had been sitting in was empty. The tea was ice cold. And it had never been touched.`
+  },
+  {
+    id:4, user:'moth.eaten.mind', avatar:'M', color:'#2a1a2a',
+    time:'2 days ago', mood:'despair',
+    title:'I Found My Own Obituary in a Box of My Father\'s Things',
+    excerpt:'The date was three months from now. The cause of death was left blank. My photograph was the one from last Christmas — the one I took two weeks ago.',
+    reads:5621, echoes:892,
+    full:`I found my own obituary in a box of my father's things.\n\nHe passed in September. We weren't close. I drove six hours to help my aunt sort through the house — the small, stifling house where I'd never been happy as a child.\n\nIn a shoebox, beneath old letters and a broken watch, there was a folded newspaper clipping. The paper was yellowed. Old. But the photograph — my photograph — was taken two weeks ago. Last Christmas. I know because I remember the sweater.\n\nThe date printed was three months from now. The cause of death was blank. Just a line. An empty space where a reason should be.\n\nI don't know what to do with this information. I've told no one. I carry the clipping in my wallet. I take it out sometimes and read my name in print, in past tense, and I wonder if knowing changes anything at all.`
+  }
+];
+
+// ─── RENDER FEED ───
+function renderFeed(list) {
+  const feed = document.getElementById('storyFeed');
+  feed.innerHTML = '';
+  list.forEach(s => {
+    feed.innerHTML += `
+    <div class="story-card">
+      <div class="card-header">
+        <div class="card-avatar" style="background:linear-gradient(135deg,${s.color},#0a0a0f)">${s.avatar}</div>
+        <div class="card-user">
+          <div class="card-username">${s.user}</div>
+          <div class="card-time">${s.time}</div>
+        </div>
+        <span class="card-mood">${s.mood}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title" onclick="openModal('${s.title.replace(/'/g,"\\'")}', stories[${s.id-1}].full)">${s.title}</div>
+        <p class="card-excerpt">${s.excerpt}</p>
+      </div>
+      <div class="card-footer">
+        <button class="card-action" onclick="echo(this)"><span class="icon">⟳</span> <span>${s.echoes}</span> echoes</button>
+        <button class="card-action"><span class="icon">☽</span> ${s.reads} reads</button>
+        <button class="card-action read-more" onclick="openModal('${s.title.replace(/'/g,"\\'")}', stories[${s.id-1}].full)">Read › </button>
+      </div>
+    </div>`;
+  });
+}
+
+renderFeed(stories);
+
+// ─── LONG STORY 1 ───
+const longStory1 = `I moved in on a Thursday. By Friday, I noticed the walls had a rhythm — a slow, almost imperceptible expansion and contraction, like the house was alive and breathing in its sleep.\n\nI told myself it was the wood settling in winter cold. Old houses do this. Every realtor says so.\n\nBy the second week, I started sleeping with headphones in — not music, just noise. Enough to drown out the sound. But noise-canceling headphones do nothing about the feeling. About the way the air in the hallway felt warmer and wetter at 3am, like breathing on skin.\n\nI found the basement door on a Wednesday. This is the part that still doesn't make sense: the floor plan showed no basement. The previous owners disclosed no basement. The inspection found no basement.\n\nBehind the door was a staircase going down, and at the bottom, a room lined with mirrors. Every mirror was facing a wall. Someone had turned them all around, deliberately, so they wouldn't reflect.\n\nIn the center of the room, on a wooden chair, was a photograph of every person who had ever lived in this house.\n\nI was in the most recent photograph. I was asleep. The timestamp on the photo was from two nights ago.\n\nI left that morning. I still don't know who took the picture. I still don't know why the mirrors were turned. But sometimes, at night, in my new apartment, I feel it — that slow rhythm. That expansion. That contraction.\n\nThe house found me again.`;
+
+// ─── MODAL ───
+function openModal(title, body) {
+  document.getElementById('modalTitle').textContent = title;
+  const bodyEl = document.getElementById('modalBody');
+  bodyEl.innerHTML = '';
+  body.split('\n\n').forEach(p => {
+    if(p.trim()) { const el = document.createElement('p'); el.textContent = p; bodyEl.appendChild(el); }
+  });
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if(e.target === document.getElementById('modalOverlay'))
+    document.getElementById('modalOverlay').classList.remove('open');
+}
+
+// ─── TABS ───
+function switchTab(el, type) {
+  document.querySelectorAll('.feed-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  if(type === 'trending') renderFeed([...stories].sort((a,b)=>b.reads-a.reads));
+  else if(type === 'haunting') renderFeed(stories.filter(s=>s.mood==='haunting'||s.mood==='fear'||s.mood==='paranormal'));
+  else renderFeed(stories);
+}
+
+// ─── WRITER ───
+function updateAvatar(val) {
+  document.getElementById('writerAvatar').textContent = val ? val[0].toUpperCase() : '?';
+}
+
+let anonOn = true;
+function toggleAnon() {
+  anonOn = !anonOn;
+  const t = document.getElementById('anonToggle');
+  const l = document.getElementById('anonLabel');
+  t.style.background = anonOn ? 'var(--blood)' : 'var(--fog)';
+  t.style.setProperty('--pos', anonOn ? '14px' : '2px');
+  t.querySelector ? null : null;
+  l.textContent = anonOn ? 'Anonymous' : 'Named';
+  if(anonOn) {
+    document.getElementById('writerName').value = '';
+    document.getElementById('writerAvatar').textContent = '?';
+  }
+}
+
+function updateCharCount() {
+  const body = document.getElementById('storyBody').value;
+  document.getElementById('charCount').textContent = `${body.length} / 5000`;
+}
+
+function toggleTag(el) { el.classList.toggle('active'); }
+
+function clearForm() {
+  document.getElementById('storyTitle').value = '';
+  document.getElementById('storyBody').value = '';
+  document.getElementById('writerName').value = '';
+  document.getElementById('writerAvatar').textContent = '?';
+  document.getElementById('charCount').textContent = '0 / 5000';
+  document.querySelectorAll('.mood-tag').forEach(t => t.classList.remove('active'));
+}
+
+function submitStory() {
+  const title = document.getElementById('storyTitle').value.trim();
+  const body = document.getElementById('storyBody').value.trim();
+  if(!title || !body) { showToast('Your story needs a name and a body.'); return; }
+
+  const name = document.getElementById('writerName').value.trim();
+  const user = (anonOn || !name) ? `anonymous_#${Math.floor(Math.random()*9999)}` : name;
+  const activeTags = [...document.querySelectorAll('.mood-tag.active')].map(t=>t.textContent);
+  const mood = activeTags[0] || 'haunting';
+
+  const newStory = {
+    id: stories.length + 1,
+    user, avatar: user[0].toUpperCase(), color: randomColor(),
+    time: 'Just now', mood,
+    title, excerpt: body.slice(0,180) + (body.length > 180 ? '...' : ''),
+    reads: 1, echoes: 0, full: body
+  };
+
+  stories.unshift(newStory);
+  renderFeed(stories);
+  clearForm();
+  document.getElementById('feedSection').scrollIntoView({ behavior:'smooth' });
+  showToast('Your whisper has been released into the dark.');
+}
+
+function randomColor() {
+  const colors = ['#3a1a1a','#1a1a3a','#1a2a1a','#2a1a2a','#1a2a2a','#2a2a1a'];
+  return colors[Math.floor(Math.random()*colors.length)];
+}
+
+function echo(btn) {
+  const span = btn.querySelector('span:last-child');
+  const n = parseInt(span.textContent);
+  span.textContent = `${n+1}`;
+  btn.style.color = 'var(--crimson)';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function scrollToWrite() { document.getElementById('write').scrollIntoView({ behavior:'smooth' }); }
+function scrollToFeed() { document.getElementById('feed').scrollIntoView({ behavior:'smooth' }); }
+</script>
+</body>
+</html>
